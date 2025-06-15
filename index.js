@@ -42,6 +42,12 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/joinedEvents', async (req, res) => {
+      const userEmail = req.query.email;
+      const result = await joinedCollenction.find({ userEmail }).toArray();
+      res.send(result);
+    });
+
     app.post('/events', async (req, res) => {
       const newEvents = req.body;
       const result = await userCollenction.insertOne(newEvents);
@@ -52,6 +58,7 @@ async function run() {
       const result = await joinedCollenction.insertOne(newEvents);
       res.send(result);
     });
+
 
 
 
