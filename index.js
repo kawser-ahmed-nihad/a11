@@ -25,16 +25,36 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const userCollenction = client.db('ServeSphere').collection('events');
+    const joinedCollenction = client.db('ServeSphere').collection('joinedEvents');
     await client.connect();
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
-    app.post('/events', async (req, res) => {
-      const newUser = req.body;
-      const result = await userCollenction.insertOne(newUser);
+    app.get('/events', async (req, res) => {
+      const events = await userCollenction.find().toArray();
+      res.send(events);
+    });
+
+    app.get('/events/:id', async (req, res) => {
+      const id = req.params.id;
+      const result = await userCollenction.findOne({ _id: new ObjectId(id) });
       res.send(result);
     });
+
+    app.post('/events', async (req, res) => {
+      const newEvents = req.body;
+      const result = await userCollenction.insertOne(newEvents);
+      res.send(result);
+    });
+    app.post('/joinedEvents', async (req, res) => {
+      const newEvents = req.body;
+      const result = await joinedCollenction.insertOne(newEvents);
+      res.send(result);
+    });
+
+
+
 
 
   } finally {
