@@ -32,9 +32,29 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     app.get('/events', async (req, res) => {
-      const events = await userCollenction.find().toArray();
-      res.send(events);
+      const { search, eventType } = req.query;
+
+      const query = {};
+
+
+      if (search) {
+        query.title = { $regex: search, $options: 'i' };
+      }
+
+
+      if (eventType) {
+        query.eventType = eventType;
+      }
+
+      try {
+        const events = await userCollenction.find(query).sort({ date: 1 }).toArray(); // Sorted by date ascending
+        res.send(events);
+      } catch (error) {
+        console.error('Error fetching filtered events:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+      }
     });
+
 
     app.get('/events/:id', async (req, res) => {
       const id = req.params.id;
@@ -75,6 +95,12 @@ async function run() {
       const newEvents = req.body;
       const result = await joinedCollenction.insertOne(newEvents);
       res.send(result);
+    });
+    app.delete('/events/:id', async (req, res) => {
+      const id = req.params.id;
+      const result = await userCollenction.deleteOne({ _id: new ObjectId(id) });
+      res.send(result);
+
     });
 
 
