@@ -48,6 +48,24 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/myEvents', async (req, res) => {
+      const userEmail = req.query.email;
+      const result = await userCollenction.find({ createdBy: userEmail }).toArray();
+      res.send(result);
+    });
+
+    app.put('/eventUpdate/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedPlant = req.body;
+      const result = await userCollenction.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedPlant }
+      );
+      res.send(result);
+
+    });
+
+
     app.post('/events', async (req, res) => {
       const newEvents = req.body;
       const result = await userCollenction.insertOne(newEvents);
@@ -58,8 +76,6 @@ async function run() {
       const result = await joinedCollenction.insertOne(newEvents);
       res.send(result);
     });
-
-
 
 
 
