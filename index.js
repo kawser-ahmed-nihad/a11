@@ -5,9 +5,13 @@ const jwt = require('jsonwebtoken')
 const cookiParser = require('cookie-parser');
 const port = process.env.PORT || 3000;
 app.use(cors({
-  origin: ['https://servesphere-4fb04.web.app'],
+  origin: [
+    'http://localhost:5173', 
+    'https://servesphere-4fb04.web.app'
+  ],
   credentials: true
-}))
+}));
+
 app.use(express.json());
 app.use(cookiParser());
 
@@ -66,7 +70,7 @@ async function run() {
 
       res.cookie('token', token, {
         httpOnly: true,
-        secure: false
+        secure: true
       })
       res.send({ success: true })
     })
