@@ -179,20 +179,29 @@ async function run() {
       res.send(result);
 
     });
-    
-    app.get('/joinedEvents/check', async (req, res) => {
+
+    app.get('/joinedEvents/check', logger, verifytken, async (req, res) => {
       const { eventId, email } = req.query;
+
+      if (email !== req.decoded.email) {
+        return res.status(401).send({ message: 'forbidden access' });
+      }
 
       if (!eventId || !email) {
         return res.status(400).json({ error: 'Missing parameters' });
       }
 
-      const alreadyJoined = await db.collection('joinedEvents').findOne({
-        eventId,
-        userEmail: email,
-      });
+      try {
+        const alreadyJoined = await joinedCollenction.findOne({
+          eventId: eventId,
+          userEmail: email,
+        });
 
-      res.json({ alreadyJoined: !!alreadyJoined });
+        res.send({ alreadyJoined: !!alreadyJoined });
+      } catch (error) {
+        console.error('Error checking join status:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
     });
 
 
