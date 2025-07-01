@@ -6,7 +6,7 @@ const cookiParser = require('cookie-parser');
 const port = process.env.PORT || 3000;
 app.use(cors({
   origin: [
-    'http://localhost:5173', 
+    'http://localhost:5173',
     'https://servesphere-4fb04.web.app'
   ],
   credentials: true
@@ -71,7 +71,7 @@ async function run() {
       res.cookie('token', token, {
         httpOnly: true,
         secure: true,
-        sameSite: 'none' 
+        sameSite: 'none'
       })
       res.send({ success: true })
     })
@@ -178,6 +178,21 @@ async function run() {
       const result = await userCollenction.deleteOne({ _id: new ObjectId(id) });
       res.send(result);
 
+    });
+    
+    app.get('/joinedEvents/check', async (req, res) => {
+      const { eventId, email } = req.query;
+
+      if (!eventId || !email) {
+        return res.status(400).json({ error: 'Missing parameters' });
+      }
+
+      const alreadyJoined = await db.collection('joinedEvents').findOne({
+        eventId,
+        userEmail: email,
+      });
+
+      res.json({ alreadyJoined: !!alreadyJoined });
     });
 
 
